@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕉️ Divine Sample Size Calculator 🕉️</title>
+    <style>
+        /* Core Variables */
+        :root {
+            --primary: #FF7722;
+            --primary-dark: #E65D00;
+            --primary-hover: #ff8c44;
+            --secondary: #138808;
+            --accent: #FF9933;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gradient: linear-gradient(135deg, #FF9933, #138808);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--gradient);
+            padding: 2rem;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Study Type Selection */
+        .study-selector {
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+
+        .study-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .study-btn {
+            padding: 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            background: white;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .study-btn:hover,
+        .study-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .study-btn i {
+            font-size: 1.5rem;
+        }
+
+        /* Form Styles */
+        .calculator-section {
+            padding: 2rem;
+            display: none;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .calculator-section.active {
+            display: block;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #444;
+        }
+
+        .input-group small {
+            display: block;
+            color: #666;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 119, 34, 0.1);
+        }
+
+        /* Results Styles */
+        .results-section {
+            padding: 2rem;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .result-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .result-header {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            color: var(--primary);
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .details-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        /* Button Styles */
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        /* Animation Keyframes */
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .container { border-radius: 8px; }
+            .study-grid { grid-template-columns: 1fr; }
+            .calculator-section { padding: 1rem; }
+            .form-section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🕉️ Divine Sample Size Calculator 🕉️</h1>
+            <p>Calculate with divine precision and statistical clarity</p>
+        </div>
+
+        <div class="study-selector">
+            <h2>Select Your Study Type</h2>
+            <div class="study-grid">
+                <button class="study-btn" data-type="descriptive">
+                    📊 Descriptive Study
+                </button>
+                <button class="study-btn" data-type="comparative">
+                    🔄 Comparative Study
+                </button>
+                <button class="study-btn" data-type="case-control">
+                    🎯 Case-Control Study
+                </button>
+                <button class="study-btn" data-type="cohort">
+                    👥 Cohort Study
+                </button>
+                <button class="study-btn" data-type="clinical">
+                    💊 Clinical Trial
+                </button>
+                <button class="study-btn" data-type="diagnostic">
+                    🔍 Diagnostic Study
+                </button>
+            </div>
+        </div>
+
+        <div id="calculatorSection" class="calculator-section">
+            <!-- Dynamic calculator forms will be inserted here -->
+        </div>
+
+        <div id="resultsSection" class="results-section">
+            <!-- Results will be displayed here -->
+        </div>
+
+        <div class="footer">
+            <p>Made with ❤️ by Karmayogi</p>
+            <p>🕉️ जय श्री राम 🕉️</p>
+        </div>
+    </div>
+<script>
+// Divine Sample Size Calculator - Core Implementation
+const DivineCalculator = {
+    // Properties
+    currentStudyType: null,
+    calculatorSection: null,
+    resultsSection: null,
+
+    // Statistical constants
+    zScores: {
+        80: 1.282,
+        85: 1.440,
+        90: 1.645,
+        95: 1.960,
+        97.5: 2.240,
+        99: 2.576,
+        99.5: 2.807,
+        99.9: 3.291
+    },
+    
+    // Initialization
+    init() {
+        console.log('Initializing Divine Calculator...'); 
+        this.calculatorSection = document.getElementById('calculatorSection');
+        this.resultsSection = document.getElementById('resultsSection');
+        
+        if (!this.calculatorSection || !this.resultsSection) {
+            console.error('Required sections not found!');
+            return;
+        }
+        
+        this.setupStudyButtons();
+        console.log('Divine Calculator initialized 🕉️');
+    },
+    
+resetSections() {
+    if (this.calculatorSection) {
+        this.calculatorSection.innerHTML = '';
+        this.calculatorSection.style.display = 'none';
+        this.calculatorSection.classList.remove('active');
+    }
+    if (this.resultsSection) {
+        this.resultsSection.innerHTML = '';
+        this.resultsSection.style.display = 'none';
+    }
+},
+    // Event Handlers Setup
+   // REPLACE Method 3: Replace the old setupStudyButtons() with this:
+    setupStudyButtons() {
+    const studyButtons = document.querySelectorAll('.study-btn');
+    
+    studyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            console.log('Button clicked:', button.dataset.type); // Debug log
+            
+            // Remove active class from all buttons
+            studyButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            // Set current study type and switch calculator
+            this.currentStudyType = button.dataset.type;
+            this.switchCalculator();
+        });
+    });
+},
+
+    // Calculator Type Switching
+    switchCalculator() {
+    // Reset sections
+    this.resetSections();
+    let calculatorHtml = '';
+    
+    // Generate appropriate calculator based on study type
+    switch(this.currentStudyType) {
+        case 'descriptive':
+            calculatorHtml = this.getDescriptiveCalculator();
+            break;
+        case 'comparative':
+            calculatorHtml = this.getComparativeCalculator();
+            break;
+        case 'case-control':
+            calculatorHtml = this.getCaseControlCalculator();
+            break;
+        case 'cohort':
+            calculatorHtml = this.getCohortCalculator();
+            break;
+        case 'clinical':
+            calculatorHtml = this.getClinicalTrialCalculator();
+            break;
+        case 'diagnostic':
+            calculatorHtml = this.getDiagnosticCalculator();
+            break;
+        default:
+            calculatorHtml = '<p>Select a study type to begin.</p>';
+    }
+
+    // Important: First update the content
+    this.calculatorSection.innerHTML = calculatorHtml;
+    
+    // Then make section visible and add active class
+    this.calculatorSection.style.display = 'block';
+    this.calculatorSection.classList.add('active');
+
+    // Setup calculator specific behaviors
+    if (this.currentStudyType === 'clinical') {
+        this.setupClinicalBehavior();
+    } else if (this.currentStudyType === 'comparative') {
+        this.setupComparativeBehavior();
+    }
+
+    // Setup form validation for all calculators
+    this.setupFormValidation();
+
+    // Setup form submission
+    const form = this.calculatorSection.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleCalculation();
+        });
+    }
+},
+
+    // Form Validation
+    setupFormValidation() {
+        const inputs = this.calculatorSection.querySelectorAll('input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                this.validateInput(input);
+            });
+        });
+    },
+
+    validateInput(input) {
+        const value = parseFloat(input.value);
+        const min = parseFloat(input.min);
+        const max = parseFloat(input.max);
+        
+        if (input.required && !input.value) {
+            this.setInputError(input, 'This field is required');
+            return false;
+        }
+        if (min !== null && value < min) {
+            this.setInputError(input, `Minimum value is ${min}`);
+            return false;
+        }
+        if (max !== null && value > max) {
+            this.setInputError(input, `Maximum value is ${max}`);
+            return false;
+        }
+        
+        this.clearInputError(input);
+        return true;
+    },
+
+    setInputError(input, message) {
+        input.setCustomValidity(message);
+        const errorDiv = input.parentElement.querySelector('.input-error');
+        if (errorDiv) {
+            errorDiv.textContent = message;
+        } else {
+            const div = document.createElement('div');
+            div.className = 'input-error';
+            div.style.color = 'red';
+            div.textContent = message;
+            input.parentElement.appendChild(div);
+        }
+    },
+
+    clearInputError(input) {
+        input.setCustomValidity('');
+        const errorDiv = input.parentElement.querySelector('.input-error');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    },
+
+    // Calculation Handler
+    handleCalculation() {
+        try {
+            let results;
+            switch(this.currentStudyType) {
+                case 'descriptive':
+                    results = this.calculateDescriptive();
+                    break;
+                case 'comparative':
+                    results = this.calculateComparative();
+                    break;
+                case 'case-control':
+                    results = this.calculateCaseControl();
+                    break;
+                case 'cohort':
+                    results = this.calculateCohort();
+                    break;
+                case 'clinical':
+                    results = this.calculateClinical();
+                    break;
+                case 'diagnostic':
+                    results = this.calculateDiagnostic();
+                    break;
+                default:
+                    throw new Error('Invalid study type');
+            }
+
+            this.displayResults(results);
+
+        } catch (error) {
+            this.showError(error.message);
+        }
+    },
+
+    
+
+/* DESCRIPTIVE STUDY CALCULATOR */
+getDescriptiveCalculator() {
+    return `
+        <form class="calculator-form">
+            <div class="form-section">
+                <h3>Descriptive Study Sample Size Calculator</h3>
+                <div class="input-group">
+                    <label for="proportion">Expected Proportion (%)</label>
+                    <input type="number" id="proportion" class="input-field" 
+                           min="0.1" max="99.9" step="0.1" required>
+                    <small>Enter value between 0.1-99.9%</small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="marginError">Margin of Error (%)</label>
+                    <input type="number" id="marginError" class="input-field" 
+                           min="0.1" max="20" step="0.1" required>
+                    <small>Typically between 1-10%</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="confidenceLevel">Confidence Level</label>
+                    <select id="confidenceLevel" class="input-field" required>
+                        <option value="90">90%</option>
+                        <option value="95" selected>95%</option>
+                        <option value="99">99%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="designEffect">Design Effect</label>
+                    <input type="number" id="designEffect" class="input-field" 
+                           min="1" step="0.1" value="1" required>
+                    <small>Use 1 for simple random sampling</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="populationSize">Population Size (if known)</label>
+                    <input type="number" id="populationSize" class="input-field" 
+                           min="1" step="1">
+                    <small>Optional - leave blank if unknown</small>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Calculate Sample Size</button>
+        </form>
+    `;
+},
+
+calculateDescriptive() {
+    // Get inputs
+    const proportion = parseFloat(document.getElementById('proportion').value) / 100;
+    const marginError = parseFloat(document.getElementById('marginError').value) / 100;
+    const confidenceLevel = parseInt(document.getElementById('confidenceLevel').value);
+    const designEffect = parseFloat(document.getElementById('designEffect').value);
+    const populationSize = document.getElementById('populationSize').value ? 
+                          parseInt(document.getElementById('populationSize').value) : null;
+
+    // Calculate
+    const zScore = this.getZScore(confidenceLevel);
+    const p = proportion;
+    const q = 1 - p;
+    
+    // Base sample size
+    const baseSize = (Math.pow(zScore, 2) * p * q) / Math.pow(marginError, 2);
+    
+    // Apply design effect
+    const adjustedSize = baseSize * designEffect;
+    
+    // Apply finite population correction if needed
+    let finalSize = adjustedSize;
+    if (populationSize) {
+        finalSize = (populationSize * adjustedSize) / 
+                   (populationSize + adjustedSize - 1);
+    }
+
+    return {
+        type: 'descriptive',
+        baseSize: Math.ceil(baseSize),
+        adjustedSize: Math.ceil(finalSize),
+        parameters: {
+            proportion,
+            marginError,
+            confidenceLevel,
+            designEffect,
+            populationSize,
+            zScore
+        }
+    };
+},
+displayDescriptiveResults(results) {
+    return `
+        <div class="result-card">
+            <div class="result-header">
+                <h3>Descriptive Study Sample Size Results</h3>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-value">
+                    <p>Required Sample Size: ${results.adjustedSize} subjects</p>
+                    <p>Base Sample Size: ${results.baseSize}</p>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h4>Study Parameters</h4>
+                <ul>
+                    <li>Expected Proportion: ${(results.parameters.proportion * 100).toFixed(1)}%</li>
+                    <li>Margin of Error: ±${(results.parameters.marginError * 100).toFixed(1)}%</li>
+                    <li>Confidence Level: ${results.parameters.confidenceLevel}%</li>
+                    <li>Design Effect: ${results.parameters.designEffect}</li>
+                    ${results.parameters.populationSize ? 
+                      `<li>Population Size: ${results.parameters.populationSize}</li>` : ''}
+                </ul>
+            </div>
+
+            <div class="details-card">
+                <h4>Recommendations</h4>
+                <ul>
+                    <li>Consider adding 10% for potential non-response</li>
+                    <li>Ensure random sampling methodology</li>
+                    <li>Document all assumptions in study protocol</li>
+                </ul>
+            </div>
+        </div>
+    `;
+},
+
+
+/* COMPARATIVE STUDY CALCULATOR */
+getComparativeCalculator() {
+    return `
+        <form class="calculator-form">
+            <div class="form-section">
+                <h3>Comparative Study Sample Size Calculator</h3>
+                
+                <div class="input-group">
+                    <label for="comparisonType">Type of Comparison</label>
+                    <select id="comparisonType" class="input-field" required>
+                        <option value="">Select comparison type</option>
+                        <option value="means">Compare Means</option>
+                        <option value="proportions">Compare Proportions</option>
+                    </select>
+                </div>
+
+                <div id="meansInputs" style="display:none;">
+                    <!-- Means comparison inputs -->
+                </div>
+
+                <div id="proportionsInputs" style="display:none;">
+                    <!-- Proportions comparison inputs -->
+                </div>
+
+                <!-- Common inputs -->
+                <div class="input-group">
+                    <label for="alpha">Significance Level (α)</label>
+                    <select id="alpha" class="input-field" required>
+                        <option value="0.05" selected>5%</option>
+                        <option value="0.01">1%</option>
+                        <option value="0.1">10%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="power">Power (1-β)</label>
+                    <select id="power" class="input-field" required>
+                        <option value="0.8" selected>80%</option>
+                        <option value="0.9">90%</option>
+                        <option value="0.95">95%</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Calculate Sample Size</button>
+        </form>
+    `;
+},
+// Add this method for Comparative Study Behavior
+setupComparativeBehavior() {
+    const comparisonType = document.getElementById('comparisonType');
+    const meansInputs = document.getElementById('meansInputs');
+    const proportionsInputs = document.getElementById('proportionsInputs');
+
+    if (comparisonType) {
+        comparisonType.addEventListener('change', () => {
+            // Update means inputs HTML
+            meansInputs.innerHTML = comparisonType.value === 'means' ? `
+                <div class="input-group">
+                    <label for="mean1">Group 1 Mean</label>
+                    <input type="number" id="mean1" class="input-field" step="any" required>
+                </div>
+                <div class="input-group">
+                    <label for="mean2">Group 2 Mean</label>
+                    <input type="number" id="mean2" class="input-field" step="any" required>
+                </div>
+                <div class="input-group">
+                    <label for="sd">Standard Deviation</label>
+                    <input type="number" id="sd" class="input-field" min="0" step="any" required>
+                </div>
+            ` : '';
+
+            // Update proportions inputs HTML
+            proportionsInputs.innerHTML = comparisonType.value === 'proportions' ? `
+                <div class="input-group">
+                    <label for="prop1">Group 1 Proportion (%)</label>
+                    <input type="number" id="prop1" class="input-field" min="0" max="100" step="0.1" required>
+                </div>
+                <div class="input-group">
+                    <label for="prop2">Group 2 Proportion (%)</label>
+                    <input type="number" id="prop2" class="input-field" min="0" max="100" step="0.1" required>
+                </div>
+            ` : '';
+
+            // Show/hide appropriate inputs
+            meansInputs.style.display = comparisonType.value === 'means' ? 'block' : 'none';
+            proportionsInputs.style.display = comparisonType.value === 'proportions' ? 'block' : 'none';
+        });
+    }
+},
+
+// Add this method for Comparative Results
+calculateComparative() {
+    const comparisonType = document.getElementById('comparisonType').value;
+    const alpha = parseFloat(document.getElementById('alpha').value);
+    const power = parseFloat(document.getElementById('power').value);
+    
+    let baseSize;
+    let parameters = { alpha, power };
+
+    if (comparisonType === 'means') {
+        const mean1 = parseFloat(document.getElementById('mean1').value);
+        const mean2 = parseFloat(document.getElementById('mean2').value);
+        const sd = parseFloat(document.getElementById('sd').value);
+        
+        const diff = Math.abs(mean1 - mean2);
+        const standardizedDiff = diff / sd;
+        
+        const zAlpha = this.getZScore((1 - alpha/2) * 100);
+        const zBeta = this.getZScore(power * 100);
+        
+        baseSize = Math.ceil(2 * Math.pow((zAlpha + zBeta) / standardizedDiff, 2));
+        parameters = { ...parameters, mean1, mean2, sd, standardizedDiff };
+    }
+    else if (comparisonType === 'proportions') {
+        const p1 = parseFloat(document.getElementById('prop1').value) / 100;
+        const p2 = parseFloat(document.getElementById('prop2').value) / 100;
+        
+        const zAlpha = this.getZScore((1 - alpha/2) * 100);
+        const zBeta = this.getZScore(power * 100);
+        
+        const pBar = (p1 + p2) / 2;
+        const qBar = 1 - pBar;
+        
+        baseSize = Math.ceil(
+            2 * Math.pow(zAlpha + zBeta, 2) * pBar * qBar / Math.pow(p1 - p2, 2)
+        );
+        parameters = { ...parameters, p1, p2 };
+    }
+
+    return {
+        type: 'comparative',
+        comparisonType,
+        sampleSize: baseSize,
+        parameters
+    };
+},
+
+// Add this method for Comparative Results Display
+displayComparativeResults(results) {
+    return `
+        <div class="result-card">
+            <div class="result-header">
+                <h3>Comparative Study Sample Size Results</h3>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-value">
+                    <p>Required per group: ${results.sampleSize} subjects</p>
+                    <p>Total sample size: ${results.sampleSize * 2} subjects</p>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h4>Study Parameters</h4>
+                <ul>
+                    ${results.comparisonType === 'means' ? `
+                        <li>Mean 1: ${results.parameters.mean1}</li>
+                        <li>Mean 2: ${results.parameters.mean2}</li>
+                        <li>Standard Deviation: ${results.parameters.sd}</li>
+                        <li>Standardized Difference: ${results.parameters.standardizedDiff.toFixed(3)}</li>
+                    ` : `
+                        <li>Proportion 1: ${(results.parameters.p1 * 100).toFixed(1)}%</li>
+                        <li>Proportion 2: ${(results.parameters.p2 * 100).toFixed(1)}%</li>
+                    `}
+                    <li>Power: ${(results.parameters.power * 100)}%</li>
+                    <li>Significance Level: ${(results.parameters.alpha * 100)}%</li>
+                </ul>
+            </div>
+
+            <div class="details-card">
+                <h4>Recommendations</h4>
+                <ul>
+                    <li>Consider adding 10-15% to account for potential dropouts</li>
+                    <li>Ensure balanced randomization</li>
+                    <li>Document all assumptions in study protocol</li>
+                </ul>
+            </div>
+        </div>
+    `;
+},
+
+// Add right after the getComparativeCalculator() method
+
+/* CASE-CONTROL STUDY CALCULATOR */
+getCaseControlCalculator() {
+    return `
+        <form class="calculator-form">
+            <div class="form-section">
+                <h3>Case-Control Study Sample Size Calculator</h3>
+                
+                <div class="input-group">
+                    <label for="oddsRatio">Expected Odds Ratio</label>
+                    <input type="number" id="oddsRatio" class="input-field" 
+                           min="0.1" step="0.1" required>
+                    <small>Expected odds ratio to detect (e.g., 2.0)</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="controlExposure">Control Group Exposure (%)</label>
+                    <input type="number" id="controlExposure" class="input-field" 
+                           min="0.1" max="99.9" step="0.1" required>
+                    <small>Expected proportion of exposure in controls</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="caseControlRatio">Case:Control Ratio</label>
+                    <select id="caseControlRatio" class="input-field" required>
+                        <option value="1">1:1 (Equal)</option>
+                        <option value="0.5">1:2 (Two controls per case)</option>
+                        <option value="2">2:1 (Two cases per control)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="alpha">Significance Level (α)</label>
+                    <select id="alpha" class="input-field" required>
+                        <option value="0.05" selected>5%</option>
+                        <option value="0.01">1%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="power">Power (1-β)</label>
+                    <select id="power" class="input-field" required>
+                        <option value="0.8" selected>80%</option>
+                        <option value="0.9">90%</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Calculate Sample Size</button>
+        </form>
+    `;
+},
+
+calculateCaseControl() {
+    const oddsRatio = parseFloat(document.getElementById('oddsRatio').value);
+    const controlExposure = parseFloat(document.getElementById('controlExposure').value) / 100;
+    const ratio = parseFloat(document.getElementById('caseControlRatio').value);
+    const alpha = parseFloat(document.getElementById('alpha').value);
+    const power = parseFloat(document.getElementById('power').value);
+
+    // Calculate case exposure from odds ratio
+    const p0 = controlExposure;
+    const or = oddsRatio;
+    const p1 = (or * p0) / (1 + p0 * (or - 1));
+    
+    // Get z-scores
+    const zAlpha = this.getZScore((1 - alpha/2) * 100);
+    const zBeta = this.getZScore(power * 100);
+
+    // Calculate sample size
+    const q0 = 1 - p0;
+    const q1 = 1 - p1;
+    const baseSize = Math.pow(
+        (zAlpha * Math.sqrt((1 + 1/ratio) * p0 * q0) + 
+         zBeta * Math.sqrt(p1 * q1 + (p0 * q0)/ratio)), 2
+    ) / Math.pow(p1 - p0, 2);
+
+    const nCases = Math.ceil(baseSize);
+    const nControls = Math.ceil(baseSize * ratio);
+
+    return {
+        type: 'case-control',
+        cases: nCases,
+        controls: nControls,
+        totalSize: nCases + nControls,
+        parameters: {
+            oddsRatio,
+            controlExposure: p0,
+            caseExposure: p1,
+            ratio,
+            alpha,
+            power
+        },
+        steps: {
+            zAlpha,
+            zBeta,
+            baseSize
+        }
+    };
+},
+
+displayResults(results) {
+    let html = '';
+    
+    switch(results.type) {
+        case 'descriptive':
+            html = this.displayDescriptiveResults(results);
+            break;
+        case 'comparative':
+            html = this.displayComparativeResults(results);
+            break;
+        case 'case-control':
+            html = this.displayCaseControlResults(results);
+            break;
+        case 'cohort':
+            html = this.displayCohortResults(results);
+            break;
+        case 'clinical':
+            html = this.displayClinicalResults(results);
+            break;
+        case 'diagnostic':
+            html = this.displayDiagnosticResults(results);
+            break;
+    }
+
+    this.resultsSection.innerHTML = html;
+    this.resultsSection.style.display = 'block';
+    this.resultsSection.scrollIntoView({ behavior: 'smooth' });
+},
+
+displayCaseControlResults(results) {
+    return `
+        <div class="result-card">
+            <div class="result-header">
+                <h3>Case-Control Study Sample Size Results</h3>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-value">
+                    <p>Total Required: ${results.totalSize} subjects</p>
+                    <p>Cases: ${results.cases}</p>
+                    <p>Controls: ${results.controls}</p>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h4>Study Parameters</h4>
+                <ul>
+                    <li>Odds Ratio: ${results.parameters.oddsRatio.toFixed(2)}</li>
+                    <li>Control Exposure: ${(results.parameters.controlExposure * 100).toFixed(1)}%</li>
+                    <li>Expected Case Exposure: ${(results.parameters.caseExposure * 100).toFixed(1)}%</li>
+                    <li>Case:Control Ratio = 1:${results.parameters.ratio}</li>
+                    <li>Significance Level: ${(results.parameters.alpha * 100)}%</li>
+                    <li>Power: ${(results.parameters.power * 100)}%</li>
+                </ul>
+            </div>
+
+            <div class="details-card">
+                <h4>Recommendations</h4>
+                <ul>
+                    <li>Consider adding 10-15% to account for potential missing data</li>
+                    <li>Ensure proper matching criteria if using matched design</li>
+                    <li>Document all assumptions used in the calculation</li>
+                    ${results.parameters.controlExposure < 0.1 ? 
+                      '<li>Low exposure prevalence - consider larger sample size</li>' : ''}
+                </ul>
+            </div>
+        </div>
+    `;
+},
+
+/* COHORT STUDY CALCULATOR */
+getCohortCalculator() {
+    return `
+        <form class="calculator-form">
+            <div class="form-section">
+                <h3>Cohort Study Sample Size Calculator</h3>
+                
+                <div class="input-group">
+                    <label for="unexposedRisk">Risk in Unexposed Group (%)</label>
+                    <input type="number" id="unexposedRisk" class="input-field" 
+                           min="0.1" max="99.9" step="0.1" required>
+                    <small>Expected outcome risk in unexposed group</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="relativeRisk">Expected Relative Risk</label>
+                    <input type="number" id="relativeRisk" class="input-field" 
+                           min="0.1" step="0.1" required>
+                    <small>Expected relative risk to detect</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="exposedUnexposedRatio">Exposed:Unexposed Ratio</label>
+                    <select id="exposedUnexposedRatio" class="input-field" required>
+                        <option value="1">1:1 (Equal groups)</option>
+                        <option value="0.5">1:2 (More unexposed)</option>
+                        <option value="2">2:1 (More exposed)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="alpha">Significance Level (α)</label>
+                    <select id="alpha" class="input-field" required>
+                        <option value="0.05" selected>5%</option>
+                        <option value="0.01">1%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="power">Power (1-β)</label>
+                    <select id="power" class="input-field" required>
+                        <option value="0.8" selected>80%</option>
+                        <option value="0.9">90%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="dropoutRate">Expected Loss to Follow-up (%)</label>
+                    <input type="number" id="dropoutRate" class="input-field" 
+                           min="0" max="50" step="1" value="10" required>
+                    <small>Expected dropout percentage</small>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Calculate Sample Size</button>
+        </form>
+    `;
+},
+
+calculateCohort() {
+    const unexposedRisk = parseFloat(document.getElementById('unexposedRisk').value) / 100;
+    const relativeRisk = parseFloat(document.getElementById('relativeRisk').value);
+    const ratio = parseFloat(document.getElementById('exposedUnexposedRatio').value);
+    const alpha = parseFloat(document.getElementById('alpha').value);
+    const power = parseFloat(document.getElementById('power').value);
+    const dropoutRate = parseFloat(document.getElementById('dropoutRate').value) / 100;
+
+    // Calculate exposed risk
+    const p1 = Math.min(unexposedRisk * relativeRisk, 1);
+    const p2 = unexposedRisk;
+    const q1 = 1 - p1;
+    const q2 = 1 - p2;
+
+    // Get z-scores
+    const zAlpha = this.getZScore((1 - alpha/2) * 100);
+    const zBeta = this.getZScore(power * 100);
+
+    // Calculate base sample size
+    const baseSize = Math.pow(
+        (zAlpha * Math.sqrt((1 + 1/ratio) * p2 * q2) + 
+         zBeta * Math.sqrt(p1 * q1 + (p2 * q2)/ratio)), 2
+    ) / Math.pow(p1 - p2, 2);
+
+    // Adjust for dropouts
+    const adjustedSize = baseSize / (1 - dropoutRate);
+
+    const nExposed = Math.ceil(adjustedSize * ratio);
+    const nUnexposed = Math.ceil(adjustedSize);
+
+    return {
+        type: 'cohort',
+        exposedSize: nExposed,
+        unexposedSize: nUnexposed,
+        totalSize: nExposed + nUnexposed,
+        parameters: {
+            unexposedRisk,
+            exposedRisk: p1,
+            relativeRisk,
+            ratio,
+            alpha,
+            power,
+            dropoutRate
+        },
+        steps: {
+            zAlpha,
+            zBeta,
+            baseSize,
+            adjustedSize
+        }
+    };
+},
+
+displayCohortResults(results) {
+    return `
+        <div class="result-card">
+            <div class="result-header">
+                <h3>Cohort Study Sample Size Results</h3>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-value">
+                    <p>Total Required: ${results.totalSize} subjects</p>
+                    <p>Exposed Group: ${results.exposedSize}</p>
+                    <p>Unexposed Group: ${results.unexposedSize}</p>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h4>Study Parameters</h4>
+                <ul>
+                    <li>Unexposed Risk: ${(results.parameters.unexposedRisk * 100).toFixed(1)}%</li>
+                    <li>Expected Exposed Risk: ${(results.parameters.exposedRisk * 100).toFixed(1)}%</li>
+                    <li>Relative Risk: ${results.parameters.relativeRisk.toFixed(2)}</li>
+                    <li>Allocation Ratio: ${results.parameters.ratio}:1</li>
+                    <li>Dropout Rate: ${(results.parameters.dropoutRate * 100)}%</li>
+                </ul>
+            </div>
+
+            <div class="details-card">
+                <h4>Recommendations</h4>
+                <ul>
+                    <li>Plan interim analyses to monitor dropout rates</li>
+                    <li>Consider strategies to minimize loss to follow-up</li>
+                    ${results.parameters.dropoutRate > 0.2 ? 
+                      '<li>High dropout rate - implement retention strategies</li>' : ''}
+                    <li>Document all assumptions in study protocol</li>
+                </ul>
+            </div>
+        </div>
+    `;
+},
+
+/* CLINICAL TRIAL CALCULATOR */
+// PART 1: HTML Form Generator
+getClinicalTrialCalculator() {
+    return `
+        <form class="calculator-form" id="clinicalTrialForm">
+            <div class="form-section">
+                <h3>Clinical Trial Sample Size Calculator</h3>
+                
+                <!-- Trial Type Selection -->
+                <div class="input-group">
+                    <label for="trialType">Trial Type</label>
+                    <select id="trialType" class="input-field" required>
+                        <option value="">Select trial type</option>
+                        <option value="superiority">Superiority Trial</option>
+                        <option value="noninferiority">Non-Inferiority Trial</option>
+                        <option value="equivalence">Equivalence Trial</option>
+                    </select>
+                </div>
+
+                <!-- Outcome Type Selection -->
+                <div class="input-group">
+                    <label for="outcomeType">Primary Outcome Type</label>
+                    <select id="outcomeType" class="input-field" required>
+                        <option value="">Select outcome type</option>
+                        <option value="binary">Binary (Success/Failure)</option>
+                        <option value="continuous">Continuous (Measurement)</option>
+                        <option value="survival">Time-to-Event</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Inputs Container -->
+                <div id="dynamicInputs"></div>
+
+                <!-- Statistical Parameters -->
+                <div class="input-group">
+                    <label for="alpha">Significance Level (α)</label>
+                    <select id="alpha" class="input-field" required>
+                        <option value="0.05">5%</option>
+                        <option value="0.025">2.5%</option>
+                        <option value="0.01">1%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="power">Power (1-β)</label>
+                    <select id="power" class="input-field" required>
+                        <option value="0.8">80%</option>
+                        <option value="0.9">90%</option>
+                        <option value="0.95">95%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="allocation">Allocation Ratio (Treatment:Control)</label>
+                    <select id="allocation" class="input-field" required>
+                        <option value="1">1:1</option>
+                        <option value="2">2:1</option>
+                        <option value="0.5">1:2</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="dropoutRate">Expected Dropout Rate (%)</label>
+                    <input type="number" id="dropoutRate" class="input-field" 
+                           min="0" max="50" value="10" step="1" required>
+                    <small>Expected loss to follow-up percentage</small>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Calculate Sample Size</button>
+        </form>
+    `;
+},
+
+// PART 2: Dynamic Input Templates
+clinicalTrialTemplates: {
+    binary: `
+        <div class="input-group">
+            <label for="controlRate">Control Group Success Rate (%)</label>
+            <input type="number" id="controlRate" class="input-field" 
+                   min="0.1" max="99.9" step="0.1" required>
+            <small>Expected success rate in control group</small>
+        </div>
+        <div class="input-group">
+            <label for="expectedDifference">Expected Difference (%)</label>
+            <input type="number" id="expectedDifference" class="input-field" 
+                   step="0.1" required>
+            <small>Expected difference between groups</small>
+        </div>
+    `,
+    continuous: `
+        <div class="input-group">
+            <label for="expectedMeanDiff">Expected Mean Difference</label>
+            <input type="number" id="expectedMeanDiff" class="input-field" step="any" required>
+            <small>Expected difference in means between groups</small>
+        </div>
+        <div class="input-group">
+            <label for="standardDev">Expected Standard Deviation</label>
+            <input type="number" id="standardDev" class="input-field" min="0" step="any" required>
+            <small>Common standard deviation in both groups</small>
+        </div>
+    `,
+    survival: `
+        <div class="input-group">
+            <label for="medianControl">Median Survival Time (Control)</label>
+            <input type="number" id="medianControl" class="input-field" min="0" step="any" required>
+            <small>Median survival time in control group</small>
+        </div>
+        <div class="input-group">
+            <label for="hazardRatio">Expected Hazard Ratio</label>
+            <input type="number" id="hazardRatio" class="input-field" min="0" step="0.01" required>
+            <small>Expected hazard ratio between groups</small>
+        </div>
+        <div class="input-group">
+            <label for="accrualTime">Accrual Time (months)</label>
+            <input type="number" id="accrualTime" class="input-field" min="0" step="1" required>
+            <small>Duration of patient recruitment</small>
+        </div>
+        <div class="input-group">
+            <label for="followupTime">Minimum Follow-up (months)</label>
+            <input type="number" id="followupTime" class="input-field" min="0" step="1" required>
+            <small>Minimum follow-up time after last patient recruited</small>
+        </div>
+    `
+},
+
+// PART 3: Setup and Behavior
+setupClinicalBehavior() {
+    const elements = {
+        form: document.getElementById('clinicalTrialForm'),
+        dynamicInputs: document.getElementById('dynamicInputs'),
+        outcomeType: document.getElementById('outcomeType'),
+        trialType: document.getElementById('trialType'),
+        alpha: document.getElementById('alpha')
+    };
+
+    // Verify all elements exist
+    if (!Object.values(elements).every(el => el)) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    // Handle outcome type changes
+    elements.outcomeType.addEventListener('change', () => {
+        const selectedType = elements.outcomeType.value;
+        elements.dynamicInputs.innerHTML = selectedType ? 
+            this.clinicalTrialTemplates[selectedType] || '' : '';
+    });
+
+    // Handle trial type changes
+    elements.trialType.addEventListener('change', () => {
+        elements.alpha.value = ['noninferiority', 'equivalence']
+            .includes(elements.trialType.value) ? '0.025' : '0.05';
+    });
+
+    // Handle form submission
+    elements.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.validateAndCalculate(elements);
+    });
+},
+
+// PART 4: Validation and Calculation
+validateAndCalculate(elements) {
+    try {
+        // Validate outcome type selection
+        if (!elements.outcomeType.value) {
+            throw new Error('Please select an outcome type');
+        }
+
+        // Validate all required fields
+        const requiredFields = elements.form.querySelectorAll('[required]');
+        const emptyFields = Array.from(requiredFields)
+            .filter(field => !field.value)
+            .map(field => field.id);
+
+        if (emptyFields.length > 0) {
+            throw new Error(`Please fill in: ${emptyFields.join(', ')}`);
+        }
+
+        // If validation passes, calculate
+        const results = this.calculateClinical();
+        this.displayResults(results);
+
+    } catch (error) {
+        console.error('Validation error:', error);
+        this.showError(error.message);
+    }
+},
+// PART 5: Main Clinical Calculation Method
+calculateClinical() {
+    try {
+        // Get and validate basic parameters
+        const params = this.getBasicParameters();
+        
+        // Calculate base size based on outcome type
+        let baseSize = this.calculateBaseSize(params);
+        
+        // Adjust for dropouts
+        const adjustedSize = baseSize / (1 - params.dropoutRate);
+        const n1 = Math.ceil(adjustedSize);
+        const n2 = Math.ceil(adjustedSize * params.allocation);
+
+        // Get outcome-specific parameters
+        const outcomeParams = this.getOutcomeParameters(params.outcomeType);
+
+        return {
+            type: 'clinical',
+            treatmentSize: n1,
+            controlSize: n2,
+            totalSize: n1 + n2,
+            outcomeType: params.outcomeType,
+            trialType: params.trialType,
+            parameters: {
+                ...params,
+                ...outcomeParams
+            },
+            steps: {
+                zAlpha: params.zAlpha,
+                zBeta: params.zBeta,
+                baseSize,
+                adjustedSize
+            }
+        };
+    } catch (error) {
+        console.error('Clinical calculation error:', error);
+        throw new Error(`Calculation failed: ${error.message}`);
+    }
+},
+
+// PART 6: Helper Methods for Calculations
+getBasicParameters() {
+    const getValue = (id) => {
+        const element = document.getElementById(id);
+        if (!element || !element.value) {
+            throw new Error(`Missing value for ${id}`);
+        }
+        return element.value;
+    };
+
+    const trialType = getValue('trialType');
+    const outcomeType = getValue('outcomeType');
+    const alpha = parseFloat(getValue('alpha'));
+    const power = parseFloat(getValue('power'));
+    const allocation = parseFloat(getValue('allocation'));
+    const dropoutRate = parseFloat(getValue('dropoutRate')) / 100;
+
+    const zAlpha = this.getZScore((1 - alpha) * 100);
+    const zBeta = this.getZScore(power * 100);
+
+    return {
+        trialType,
+        outcomeType,
+        alpha,
+        power,
+        allocation,
+        dropoutRate,
+        zAlpha,
+        zBeta
+    };
+},
+
+getOutcomeParameters(outcomeType) {
+    const getNumericValue = (id) => {
+        const element = document.getElementById(id);
+        if (!element || !element.value) {
+            throw new Error(`Missing value for ${id}`);
+        }
+        return parseFloat(element.value);
+    };
+
+    switch(outcomeType) {
+        case 'binary':
+            return {
+                controlRate: getNumericValue('controlRate'),
+                expectedDiff: getNumericValue('expectedDifference')
+            };
+        case 'continuous':
+            return {
+                meanDiff: getNumericValue('expectedMeanDiff'),
+                stdDev: getNumericValue('standardDev')
+            };
+        case 'survival':
+            return {
+                hazardRatio: getNumericValue('hazardRatio'),
+                medianControl: getNumericValue('medianControl'),
+                accrualTime: getNumericValue('accrualTime'),
+                followupTime: getNumericValue('followupTime')
+            };
+        default:
+            throw new Error('Invalid outcome type');
+    }
+},
+
+calculateBaseSize(params) {
+    switch(params.outcomeType) {
+        case 'binary':
+            return this.calculateBinarySize(params);
+        case 'continuous':
+            return this.calculateContinuousSize(params);
+        case 'survival':
+            return this.calculateSurvivalSize(params);
+        default:
+            throw new Error('Invalid outcome type');
+    }
+},
+
+// PART 7: Specific Calculations
+calculateBinarySize(params) {
+    const controlRate = parseFloat(document.getElementById('controlRate').value) / 100;
+    const expectedDiff = parseFloat(document.getElementById('expectedDifference').value) / 100;
+    
+    const p1 = controlRate + expectedDiff;
+    const p2 = controlRate;
+    const pBar = (p1 + p2) / 2;
+    const qBar = 1 - pBar;
+    
+    return Math.pow(
+        (params.zAlpha * Math.sqrt((1 + 1/params.allocation) * pBar * qBar) + 
+         params.zBeta * Math.sqrt(p1 * (1-p1) + (p2 * (1-p2))/params.allocation)), 2
+    ) / Math.pow(p1 - p2, 2);
+},
+
+calculateContinuousSize(params) {
+    const meanDiff = parseFloat(document.getElementById('expectedMeanDiff').value);
+    const stdDev = parseFloat(document.getElementById('standardDev').value);
+    
+    return Math.pow(params.zAlpha + params.zBeta, 2) * (1 + 1/params.allocation) * 
+           Math.pow(stdDev/meanDiff, 2);
+},
+
+calculateSurvivalSize(params) {
+    const hazardRatio = parseFloat(document.getElementById('hazardRatio').value);
+    const medianControl = parseFloat(document.getElementById('medianControl').value);
+    const logHR = Math.log(hazardRatio);
+    
+    return 4 * Math.pow(params.zAlpha + params.zBeta, 2) / Math.pow(logHR, 2);
+},
+
+// PART 8: Display Results
+displayClinicalResults(results) {
+    try {
+        if (!results || !results.parameters) {
+            throw new Error('Invalid results object');
+        }
+
+        // Format parameters safely
+        const trialType = this.formatTrialType(results.trialType);
+        const outcomeType = this.formatOutcomeType(results.outcomeType);
+        const outcomeSpecificParams = this.formatOutcomeParameters(results);
+        
+        return `
+            <div class="result-card">
+                <div class="result-header">
+                    <h3>Clinical Trial Sample Size Results</h3>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-value">
+                        <p>Total Required: ${results.totalSize} subjects</p>
+                        <p>Treatment Group: ${results.treatmentSize}</p>
+                        <p>Control Group: ${results.controlSize}</p>
+                    </div>
+                </div>
+
+                <div class="details-card">
+                    <h4>Study Design</h4>
+                    <ul>
+                        <li>Trial Type: ${trialType}</li>
+                        <li>Outcome: ${outcomeType}</li>
+                        ${outcomeSpecificParams}
+                        <li>Allocation Ratio: ${results.parameters.allocation}:1</li>
+                        <li>Power: ${(results.parameters.power * 100)}%</li>
+                        <li>Significance Level: ${(results.parameters.alpha * 100)}%</li>
+                        <li>Dropout Rate: ${(results.parameters.dropoutRate * 100)}%</li>
+                    </ul>
+                </div>
+
+                <div class="details-card">
+                    <h4>Sample Size Calculation</h4>
+                    <ul>
+                        <li>Base sample size: ${Math.ceil(results.steps.baseSize)}</li>
+                        <li>Adjusted for dropouts: ${Math.ceil(results.steps.adjustedSize)}</li>
+                    </ul>
+                </div>
+
+                <div class="details-card">
+                    <h4>Recommendations</h4>
+                    ${this.getRecommendations(results)}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error displaying results:', error);
+        this.showError('Error displaying results: ' + error.message);
+        return '';
+    }
+},
+
+formatOutcomeParameters(results) {
+    try {
+        switch(results.outcomeType) {
+            case 'binary':
+                return `
+                    <li>Control Success Rate: ${results.parameters.controlRate}%</li>
+                    <li>Expected Difference: ${results.parameters.expectedDiff}%</li>
+                `;
+            case 'continuous':
+                return `
+                    <li>Expected Mean Difference: ${results.parameters.meanDiff}</li>
+                    <li>Standard Deviation: ${results.parameters.stdDev}</li>
+                `;
+            case 'survival':
+                return `
+                    <li>Median Survival (Control): ${results.parameters.medianControl} months</li>
+                    <li>Hazard Ratio: ${results.parameters.hazardRatio}</li>
+                    <li>Accrual Time: ${results.parameters.accrualTime} months</li>
+                    <li>Follow-up Time: ${results.parameters.followupTime} months</li>
+                `;
+            default:
+                return '';
+        }
+    } catch (error) {
+        console.error('Error formatting outcome parameters:', error);
+        return '';
+    }
+},
+
+getRecommendations(results) {
+    return `
+        <ul>
+            <li>Consider interim analyses for safety and efficacy</li>
+            <li>Plan strategies to minimize dropout rates</li>
+            <li>Ensure adequate monitoring of adverse events</li>
+            <li>Document all assumptions in trial protocol</li>
+            ${results.parameters.dropoutRate > 0.15 ? 
+              '<li>High dropout rate - implement retention strategies</li>' : ''}
+        </ul>
+    `;
+},
+// Format methods for clinical trial types and outcomes
+formatTrialType(type) {
+    const trialTypes = {
+        'superiority': 'Superiority Trial',
+        'noninferiority': 'Non-Inferiority Trial',
+        'equivalence': 'Equivalence Trial'
+    };
+    return trialTypes[type] || type;
+},
+
+formatOutcomeType(type) {
+    const outcomeTypes = {
+        'binary': 'Binary Outcome (Success/Failure)',
+        'continuous': 'Continuous Outcome (Measurement)',
+        'survival': 'Time-to-Event Outcome'
+    };
+    return outcomeTypes[type] || type;
+},
+
+/* DIAGNOSTIC STUDY CALCULATOR */
+getDiagnosticCalculator() {
+    return `
+        <form class="calculator-form">
+            <div class="form-section">
+                <h3>Diagnostic Study Sample Size Calculator</h3>
+                
+                <div class="input-group">
+                    <label for="expectedSensitivity">Expected Sensitivity (%)</label>
+                    <input type="number" id="expectedSensitivity" class="input-field" 
+                           min="1" max="100" step="0.1" required>
+                    <small>Expected sensitivity of the diagnostic test</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="expectedSpecificity">Expected Specificity (%)</label>
+                    <input type="number" id="expectedSpecificity" class="input-field" 
+                           min="1" max="100" step="0.1" required>
+                    <small>Expected specificity of the diagnostic test</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="prevalence">Disease Prevalence (%)</label>
+                    <input type="number" id="prevalence" class="input-field" 
+                           min="0.1" max="99.9" step="0.1" required>
+                    <small>Expected disease prevalence in the study population</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="precision">Desired Precision (±%)</label>
+                    <input type="number" id="precision" class="input-field" 
+                           min="0.1" max="20" step="0.1" required>
+                    <small>Desired margin of error for sensitivity/specificity</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="confidenceLevel">Confidence Level</label>
+                    <select id="confidenceLevel" class="input-field" required>
+                        <option value="95" selected>95%</option>
+                        <option value="90">90%</option>
+                        <option value="99">99%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="dropoutRate">Expected Loss to Follow-up (%)</label>
+                    <input type="number" id="dropoutRate" class="input-field" 
+                           min="0" max="50" step="1" value="10" required>
+                    <small>Expected participant dropout percentage</small>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Calculate Sample Size</button>
+        </form>
+    `;
+},
+
+calculateDiagnostic() {
+    // Get inputs
+    const sensitivity = parseFloat(document.getElementById('expectedSensitivity').value) / 100;
+    const specificity = parseFloat(document.getElementById('expectedSpecificity').value) / 100;
+    const prevalence = parseFloat(document.getElementById('prevalence').value) / 100;
+    const precision = parseFloat(document.getElementById('precision').value) / 100;
+    const confidenceLevel = parseInt(document.getElementById('confidenceLevel').value);
+    const dropoutRate = parseFloat(document.getElementById('dropoutRate').value) / 100;
+
+    // Get z-score
+    const zScore = this.getZScore(confidenceLevel);
+
+    // Calculate for sensitivity
+    const nSensitivity = this.calculateSensitivitySampleSize(
+        sensitivity, precision, zScore, prevalence
+    );
+
+    // Calculate for specificity
+    const nSpecificity = this.calculateSpecificitySampleSize(
+        specificity, precision, zScore, prevalence
+    );
+
+    // Take the larger sample size
+    const baseSize = Math.max(nSensitivity, nSpecificity);
+
+    // Adjust for dropouts
+    const adjustedSize = baseSize / (1 - dropoutRate);
+
+    // Calculate disease positive and negative counts
+    const diseasePositive = Math.ceil(adjustedSize * prevalence);
+    const diseaseNegative = Math.ceil(adjustedSize * (1 - prevalence));
+
+    return {
+        type: 'diagnostic',
+        totalSize: Math.ceil(adjustedSize),
+        diseasePositive,
+        diseaseNegative,
+        parameters: {
+            sensitivity,
+            specificity,
+            prevalence,
+            precision,
+            confidenceLevel,
+            dropoutRate
+        },
+        steps: {
+            zScore,
+            nSensitivity,
+            nSpecificity,
+            baseSize,
+            adjustedSize
+        }
+    };
+},
+
+calculateSensitivitySampleSize(sensitivity, precision, zScore, prevalence) {
+    return (Math.pow(zScore, 2) * sensitivity * (1 - sensitivity)) / 
+           (Math.pow(precision, 2) * prevalence);
+},
+
+calculateSpecificitySampleSize(specificity, precision, zScore, prevalence) {
+    return (Math.pow(zScore, 2) * specificity * (1 - specificity)) / 
+           (Math.pow(precision, 2) * (1 - prevalence));
+},
+
+displayDiagnosticResults(results) {
+    return `
+        <div class="result-card">
+            <div class="result-header">
+                <h3>Diagnostic Study Sample Size Results</h3>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-value">
+                    <p>Total Required: ${results.totalSize} subjects</p>
+                    <p>Disease Positive: ${results.diseasePositive}</p>
+                    <p>Disease Negative: ${results.diseaseNegative}</p>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h4>Study Parameters</h4>
+                <ul>
+                    <li>Sensitivity: ${(results.parameters.sensitivity * 100).toFixed(1)}%</li>
+                    <li>Specificity: ${(results.parameters.specificity * 100).toFixed(1)}%</li>
+                    <li>Prevalence: ${(results.parameters.prevalence * 100).toFixed(1)}%</li>
+                    <li>Precision: ±${(results.parameters.precision * 100).toFixed(1)}%</li>
+                    <li>Confidence Level: ${results.parameters.confidenceLevel}%</li>
+                </ul>
+            </div>
+
+            <div class="details-card">
+                <h4>Calculation Steps</h4>
+                <ol>
+                    <li>Sample size for sensitivity: ${Math.ceil(results.steps.nSensitivity)}</li>
+                    <li>Sample size for specificity: ${Math.ceil(results.steps.nSpecificity)}</li>
+                    <li>Base sample size: ${Math.ceil(results.steps.baseSize)}</li>
+                    <li>Adjusted for dropouts: ${Math.ceil(results.steps.adjustedSize)}</li>
+                    <li>Final distribution based on ${(results.parameters.prevalence * 100).toFixed(1)}% prevalence:
+                        <ul>
+                            <li>Disease positive: ${results.diseasePositive}</li>
+                            <li>Disease negative: ${results.diseaseNegative}</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="details-card">
+                <h4>Recommendations</h4>
+                <ul>
+                    <li>Use appropriate reference standard tests</li>
+                    <li>Consider blinded assessment of test results</li>
+                    ${results.parameters.prevalence < 0.1 ? 
+                      '<li>Low disease prevalence - consider enriched sampling</li>' : ''}
+                    ${results.parameters.precision < 0.05 ? 
+                      '<li>High precision requirement - verify feasibility</li>' : ''}
+                    <li>Document verification method in protocol</li>
+                </ul>
+            </div>
+        </div>
+    `;
+},
+
+// At the very end of your code, these methods need proper closure:
+
+
+
+// Statistical Utility Methods
+    getZScore(confidence) {
+        return this.zScores[confidence] || this.zScores[95];
+    },
+
+    roundToDigits(number, digits = 2) {
+        return Number(Math.round(number + 'e' + digits) + 'e-' + digits);
+    },
+
+    calculatePower(n, alpha, effect) {
+        const zAlpha = this.getZScore(100 * (1 - alpha));
+        const zBeta = Math.sqrt(n) * effect - zAlpha;
+        return this.normalCDF(zBeta);
+    },
+
+    normalCDF(x) {
+        const t = 1 / (1 + 0.2316419 * Math.abs(x));
+        const d = 0.3989423 * Math.exp(-x * x / 2);
+        const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+        return x > 0 ? 1 - p : p;
+    },
+
+    // Error Handling
+    showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.style.color = 'red';
+        errorDiv.style.padding = '1rem';
+        errorDiv.style.marginTop = '1rem';
+        errorDiv.textContent = message;
+        
+        this.calculatorSection.appendChild(errorDiv);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => errorDiv.remove(), 5000);
+    },
+}; // Close the DivineCalculator object
+
+// Initialize calculator
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing calculator...');
+    DivineCalculator.init();
+});
+
+
+
+</script>
+</body>
+</html>
