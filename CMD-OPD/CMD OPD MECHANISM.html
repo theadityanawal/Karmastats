@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Community Medicine - Fever OPD</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .subtitle { font-size: 16px; color: #64748b; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .grid { display: grid; gap: 15px; margin-bottom: 15px; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        label { display: block; margin-bottom: 5px; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .vital { padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .value { margin-top: 5px; padding: 5px; border-radius: 4px; text-align: center; font-weight: bold; }
+        .normal { background: #dcfce7; color: #166534; }
+        .warning { background: #fef3c7; color: #92400e; }
+        .danger { background: #fee2e2; color: #991b1b; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; color: white; cursor: pointer; margin-right: 10px; }
+        .btn:hover { opacity: 0.9; }
+        .btn-save { background: #2563eb; }
+        .btn-export { background: #10b981; }
+        .btn-clear { background: #ef4444; }
+        .category-btn { padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white; margin: 0 5px 5px 0; }
+        .category-btn.active { background: #2563eb; color: white; }
+        .comorbid-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .comorbid-item { display: flex; align-items: center; gap: 5px; }
+        .comorbid-item input[type="checkbox"] { width: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .alert { padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .alert-success { background: #dcfce7; color: #166534; }
+        .alert-danger { background: #fee2e2; color: #991b1b; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">COMMUNITY MEDICINE DEPARTMENT</div>
+            <div class="subtitle">Fever OPD System</div>
+        </div>
+
+        <div id="alertArea"></div>
+
+        <div class="card">
+            <form id="opdForm">
+                <!-- Patient Info -->
+                <div class="grid grid-2">
+                    <div>
+                        <label>Patient Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div>
+                        <label>Age</label>
+                        <input type="number" id="age" required min="0">
+                    </div>
+                </div>
+
+                <!-- Physical Parameters -->
+                <div class="grid grid-3">
+                    <div class="vital">
+                        <label>Height (cm)</label>
+                        <input type="number" id="height" step="0.1" min="0" max="250">
+                        <div class="value">Enter height</div>
+                    </div>
+                    <div class="vital">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="weight" step="0.1" min="0" max="200">
+                        <div class="value">Enter weight</div>
+                    </div>
+                    <div class="vital">
+                        <label>BMI</label>
+                        <div id="bmiVal" class="value">--</div>
+                    </div>
+                </div>
+
+                <!-- Vitals -->
+                <div class="grid grid-3">
+                    <div class="vital">
+                        <label>Temperature (°F)</label>
+                        <input type="number" id="temp" step="0.1" min="95" max="108">
+                        <div id="tempVal" class="value">--</div>
+                    </div>
+                    <div class="vital">
+                        <label>Pulse (bpm)</label>
+                        <input type="number" id="pulse" min="40" max="200">
+                        <div id="pulseVal" class="value">--</div>
+                    </div>
+                    <div class="vital">
+                        <label>BP (mmHg)</label>
+                        <input type="text" id="bp" placeholder="120/80">
+                        <div id="bpVal" class="value">--</div>
+                    </div>
+                </div>
+
+                <!-- Diagnosis -->
+                <div class="section">
+                    <label>Provisional Diagnosis</label>
+                    <div id="diagnosisButtons" class="categories">
+                        <button type="button" class="category-btn" data-diagnosis="Viral Fever">Viral Fever</button>
+                        <button type="button" class="category-btn" data-diagnosis="Typhoid">Typhoid</button>
+                        <button type="button" class="category-btn" data-diagnosis="TB">TB</button>
+                        <button type="button" class="category-btn" data-diagnosis="Malaria">Malaria</button>
+                        <button type="button" class="category-btn" data-diagnosis="Dengue">Dengue</button>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <input type="text" id="diagnosis" placeholder="Other diagnosis (specify)">
+                    </div>
+                </div>
+
+                <!-- Comorbidities -->
+                <div class="section">
+                    <label>Comorbidities</label>
+                    <div class="comorbid-grid">
+                        <div class="comorbid-item">
+                            <input type="checkbox" id="dm"> <label for="dm">Diabetes</label>
+                        </div>
+                        <div class="comorbid-item">
+                            <input type="checkbox" id="htn"> <label for="htn">Hypertension</label>
+                        </div>
+                        <div class="comorbid-item">
+                            <input type="checkbox" id="ihd"> <label for="ihd">IHD</label>
+                        </div>
+                        <div class="comorbid-item">
+                            <input type="checkbox" id="asthma"> <label for="asthma">Asthma</label>
+                        </div>
+                        <div style="grid-column: 1/-1; margin-top: 10px;">
+                            <input type="text" id="otherComorbid" placeholder="Other comorbidities (specify)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral -->
+                <div class="grid grid-2">
+                    <div>
+                        <label>Referral Required</label>
+                        <select id="referralNeeded">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    <div id="referralDeptDiv" style="display:none;">
+                        <label>Referred Department</label>
+                        <input type="text" id="referralDept" placeholder="Enter department name">
+                    </div>
+                </div>
+
+                <!-- Follow-up -->
+                <div class="grid grid-2">
+                    <div>
+                        <label>Follow-up Date</label>
+                        <input type="date" id="followup">
+                    </div>
+                    <div>
+                        <label>Follow-up Category</label>
+                        <select id="followupCategory">
+                            <option value="">Select Category</option>
+                            <option value="routine">Routine Follow-up</option>
+                            <option value="urgent">Urgent Review</option>
+                            <option value="test">Review with Test Results</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-save">Save Patient Data</button>
+                    <button type="button" class="btn btn-export" onclick="exportData()">Export Data</button>
+                    <button type="button" class="btn btn-clear" onclick="clearData()">Clear All</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Patient List -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">Recent Patients</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>BMI</th>
+                        <th>Temperature</th>
+                        <th>Diagnosis</th>
+                        <th>Follow-up</th>
+                    </tr>
+                </thead>
+                <tbody id="patientList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let db;
+        
+        // Initialize IndexedDB
+        const request = indexedDB.open('opdDB', 1);
+        request.onerror = e => showAlert('Database error: ' + e.target.error, 'danger');
+        request.onsuccess = e => { db = e.target.result; loadPatients(); };
+        request.onupgradeneeded = e => e.target.result.createObjectStore('patients', {keyPath: 'id'});
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // BMI Calculator
+            ['height', 'weight'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateBMI);
+            });
+
+            // Vitals Monitor
+            ['temp', 'pulse', 'bp'].forEach(id => {
+                document.getElementById(id).addEventListener('input', checkVitals);
+            });
+
+            // BP Format
+            document.getElementById('bp').addEventListener('input', formatBP);
+
+            // Diagnosis Buttons
+            document.getElementById('diagnosisButtons').addEventListener('click', function(e) {
+                if (e.target.classList.contains('category-btn')) {
+                    document.querySelectorAll('.category-btn').forEach(btn => 
+                        btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('diagnosis').value = e.target.dataset.diagnosis;
+                }
+            });
+
+            // Referral Toggle
+            document.getElementById('referralNeeded').addEventListener('change', function() {
+                document.getElementById('referralDeptDiv').style.display = 
+                    this.value === 'yes' ? 'block' : 'none';
+            });
+
+            // Form Submit
+            document.getElementById('opdForm').addEventListener('submit', savePatient);
+        });
+
+        // Calculate BMI
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('height').value) / 100;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const bmiElem = document.getElementById('bmiVal');
+            
+            if (height && weight) {
+                const bmi = weight / (height * height);
+                bmiElem.textContent = bmi.toFixed(1);
+                const category = bmi < 18.5 ? ['Underweight', 'warning'] :
+                               bmi < 25 ? ['Normal', 'normal'] :
+                               bmi < 30 ? ['Overweight', 'warning'] :
+                               ['Obese', 'danger'];
+                bmiElem.className = 'value ' + category[1];
+            }
+        }
+
+        // Check Vitals
+        function checkVitals(e) {
+            const id = e.target.id;
+            const val = e.target.value;
+            const elem = document.getElementById(id + 'Val');
+            
+            if (!val) {
+                elem.textContent = '--';
+                elem.className = 'value';
+                return;
+            }
+            
+            let status, text = val;
+            
+            switch(id) {
+                case 'temp':
+                    text += '°F';
+                    status = val < 97 || val > 99.5 ? 'danger' :
+                            val < 97.8 || val > 99 ? 'warning' : 'normal';
+                    break;
+                case 'pulse':
+                    text += ' bpm';
+                    status = val < 60 || val > 100 ? 'danger' :
+                            val < 65 || val > 95 ? 'warning' : 'normal';
+                    break;
+                case 'bp':
+                    if (!/^\d{2,3}\/\d{2,3}$/.test(val)) return;
+                    text += ' mmHg';
+                    const [sys, dia] = val.split('/').map(Number);
+                    status = sys < 90 || sys > 140 || dia < 60 || dia > 90 ? 'danger' :
+                            sys < 100 || sys > 130 || dia < 65 || dia > 85 ? 'warning' : 'normal';
+                    break;
+            }
+            
+            elem.textContent = text;
+            elem.className = 'value ' + status;
+        }
+
+        // Format BP
+        function formatBP(e) {
+            let val = e.target.value.replace(/[^\d/]/g, '');
+            if (val.length >= 3 && !val.includes('/')) {
+                val = val.slice(0, 3) + '/' + val.slice(3);
+            }
+            e.target.value = val;
+        }
+
+        // Save Patient
+        function savePatient(e) {
+            e.preventDefault();
+            
+            const data = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                height: document.getElementById('height').value,
+                weight: document.getElementById('weight').value,
+                bmi: document.getElementById('bmiVal').textContent,
+                temp: document.getElementById('temp').value,
+                pulse: document.getElementById('pulse').value,
+                bp: document.getElementById('bp').value,
+                diagnosis: document.getElementById('diagnosis').value,
+                comorbidities: [
+                    ...['dm', 'htn', 'ihd', 'asthma']
+                        .filter(id => document.getElementById(id).checked)
+                        .map(id => document.getElementById(id).nextElementSibling.textContent),
+                    document.getElementById('otherComorbid').value
+                ].filter(Boolean),
+                referral: {
+                    needed: document.getElementById('referralNeeded').value === 'yes',
+                    department: document.getElementById('referralDept').value
+                },
+                followup: document.getElementById('followup').value,
+                followupCategory: document.getElementById('followupCategory').value
+            };
+
+            const tx = db.transaction(['patients'], 'readwrite');
+            tx.objectStore('patients').add(data).onsuccess = () => {
+                resetForm();
+                showAlert('Patient data saved successfully!', 'success');
+                loadPatients();
+            };
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('opdForm').reset();
+            document.querySelectorAll('.value').forEach(v => {
+                v.textContent = '--';
+                v.className = 'value';
+            });
+            document.querySelectorAll('.category-btn').forEach(b => 
+                b.classList.remove('active'));
+            document.getElementById('referralDeptDiv').style.display = 'none';
+        }
+
+        // Load Patients
+        function loadPatients() {
+            const tbody = document.getElementById('patientList');
+            tbody.innerHTML = '';
+            
+            db.transaction(['patients'])
+                .objectStore('patients')
+                .openCursor(null, 'prev')
+                .onsuccess = e => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        const p = cursor.value;
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${p.date}</td>
+                            <td>${p.name}</td>
+                            <td>${p.age}</td>
+                            <td>${p.bmi}</td>
+                            <td>${p.temp}°F</td>
+                            <td>${p.diagnosis}</td>
+                            <td>${p.followup || '-'}</td>
+                        `;
+                        cursor.continue();
+                    }
+                };
+        }
+
+        // Export Data
+        function exportData() {
+            db.transaction(['patients'])
+                .objectStore('patients')
+                .getAll()
+                .onsuccess = e => {
+                    const headers = [
+                        'Date', 'Name', 'Age', 'BMI', 'Temperature', 'Pulse', 'BP',
+                        'Diagnosis', 'Comorbidities', 'Referral', 'Department', 'Follow-up'
+                    ];
+                    
+                    const csv = [
+                        headers.join(','),
+                        ...e.target.result.map(p => [
+                            p.date,
+                            p.name,
+                            p.age,
+                            p.bmi,
+                            p.temp,
+                            p.pulse,
+                            p.bp,
+                            p.diagnosis,
+                            p.comorbidities.join('; '),
+                            p.referral.needed ? 'Yes' : 'No',
+                            p.referral.department || '-',
+                            p.followup
+                        ].map(v => `"${v || ''}"`)
+                         .join(','))
+                    ].join('\n');
+
+                    const link = document.createElement('a');
+                    link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+                    link.download = `fever-opd-${new Date().toISOString().slice(0,10)}.csv`;
+                    link.click();
+                };
+        }
+
+        // Clear Data
+        function clearData() {
+            if (confirm('Clear all patient records? This cannot be undone.')) {
+                db.transaction(['patients'], 'readwrite')
+                    .objectStore('patients')
+                    .clear()
+                    .onsuccess = () => {
+                        loadPatients();
+                        showAlert('All records cleared successfully', 'success');
+                    };
+            }
+        }
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            const alertArea = document.getElementById('alertArea');
+            alertArea.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
