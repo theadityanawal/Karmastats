@@ -146,6 +146,65 @@
             white-space: nowrap;
             z-index: 1;
         }
+
+        .navigation {
+            background: rgba(26, 35, 126, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(13, 71, 161, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 0.5rem 0;
+            margin-bottom: 20px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0.5rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            background: rgba(26, 35, 126, 0.2);
+        }
+
+        .nav-link:hover {
+            background: rgba(26, 35, 126, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: rgba(26, 35, 126, 0.6);
+            box-shadow: 0 0 10px rgba(26, 35, 126, 0.3);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -155,11 +214,28 @@
             <p>Infectious Disease Modeling Platform</p>
         </div>
 
+        <nav class="navigation">
+            <div class="nav-container">
+                <a href="index.html" class="nav-link">
+                    <span class="nav-icon">🏠</span>
+                    Home
+                </a>
+                <a href="KARMASTAT INFECTIOUS DISEASE MODEL.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    Standard Model
+                </a>
+                <a href="KARMASTAT ADVANCED INFECTIOUS DIEASE MODEL.html" class="nav-link">
+                    <span class="nav-icon">🔬</span>
+                    Advanced Model
+                </a>
+            </div>
+        </nav>
+
         <div class="parameters">
             <div class="card">
                 <h2>Population Settings</h2>
                 <div class="input-group">
-                    <label>Population Size 
+                    <label>Population Size
                         <span class="info" data-tooltip="Total number of individuals">ℹ️</span>
                     </label>
                     <input type="number" id="population" value="1000000" min="1000">
@@ -246,6 +322,17 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPage = window.location.pathname.split('/').pop();
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
         let chart = null;
 
         // Update range value display
@@ -341,7 +428,7 @@
 
         function updateChart(results, params) {
             const ctx = document.getElementById('modelChart').getContext('2d');
-            
+
             if (chart) {
                 chart.destroy();
             }
